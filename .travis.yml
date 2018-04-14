@@ -1,6 +1,7 @@
 env:
     global:
         - REPO_DIR=bientropy
+        - FRIENDLY_NAME=BiEntropy
         # Commit from your-project that you want to build
         - BUILD_COMMIT=master
         - PLAT=x86_64
@@ -108,5 +109,5 @@ after_success:
       if [[ $TRAVIS_TAG ]]; then
         python -m pip install twine
         python -m twine upload --repository-url https://test.pypi.org/legacy/ \
-          ${TRAVIS_BUILD_DIR}/wheelhouse/${REPO_DIR}*.whl
+          ${TRAVIS_BUILD_DIR}/wheelhouse/${FRIENDLY_NAME}*.whl
       fi
