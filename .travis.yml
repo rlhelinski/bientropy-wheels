@@ -94,20 +94,22 @@ script:
     - install_run $PLAT
 
 after_success:
+    - WHEEL_FILES=${TRAVIS_BUILD_DIR}/wheelhouse/${FRIENDLY_NAME}*.whl
     # Report checksums (needs to work on Linux and Mac OS X)
     # For Mac OSX, could use 'brew install sha2' then 'sha2 -256 <files>'
     #- md5sum ${TRAVIS_BUILD_DIR}/wheelhouse/${REPO_DIR}*
     - |
       if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        shasum -a 256 ${TRAVIS_BUILD_DIR}/wheelhouse/${REPO_DIR}*.whl
+        shasum -a 256 ${WHEEL_FILES}
         pip install --upgrade pyOpenSSL
       else
-        sha256sum ${TRAVIS_BUILD_DIR}/wheelhouse/${REPO_DIR}*.whl
+        sha256sum ${WHEEL_FILES}
       fi
     # Upload wheels to Rackspace container
     - |
       if [[ $TRAVIS_TAG ]]; then
-        python -m pip install twine
-        python -m twine upload --repository-url https://test.pypi.org/legacy/ \
-          ${TRAVIS_BUILD_DIR}/wheelhouse/${FRIENDLY_NAME}*.whl
+        python -m pip install --upgrade twine
+        python -m twine upload \
+          --repository-url https://test.pypi.org/legacy/ \
+          ${WHEEL_FILES}
       fi
