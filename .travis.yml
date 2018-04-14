@@ -109,7 +109,7 @@ after_success:
     - |
       if [[ $TRAVIS_TAG ]]; then
         python -m pip install --upgrade twine
-        python -m twine upload \
+        python -m twine upload --skip-existing \
           --repository-url https://test.pypi.org/legacy/ \
           ${WHEEL_FILES}
       fi
