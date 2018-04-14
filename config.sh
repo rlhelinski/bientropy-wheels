@@ -7,7 +7,7 @@ function pre_build {
     if [ -n "$IS_OSX" ] ; then
         brew install gmp
     else
-        apt-get install -y libgmp-dev
+        yum install -y gmp-devel
     fi
 }
 
