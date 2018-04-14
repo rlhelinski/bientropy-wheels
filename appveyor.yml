@@ -1,0 +1,105 @@
+environment:
+  global:
+    REPO_DIR: bientropy
+    PACKAGE_NAME: bientropy
+    BUILD_COMMIT: master
+    BUILD_DEPENDS: "numpy scipy"
+    TEST_DEPENDS: "numpy scipy nose"
+    WHEELHOUSE_UPLOADER_USERNAME: travis-worker
+    #WHEELHOUSE_UPLOADER_SECRET:
+    #    secure:
+    #        ...
+
+  matrix:
+    - PYTHON: "C:\\Miniconda"
+      PYTHON_VERSION: "2.7"
+      PYTHON_ARCH: "32"
+    - PYTHON: "C:\\Miniconda-x64"
+      PYTHON_VERSION: "2.7"
+      PYTHON_ARCH: "64"
+    - PYTHON: "C:\\Miniconda34"
+      PYTHON_VERSION: "3.4"
+      PYTHON_ARCH: "32"
+    - PYTHON: "C:\\Miniconda34-x64"
+      PYTHON_VERSION: "3.4"
+      PYTHON_ARCH: "64"
+    - PYTHON: "C:\\Miniconda35"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "32"
+    - PYTHON: "C:\\Miniconda35-x64"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "64"
+    - PYTHON: "C:\\Miniconda36"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "32"
+    - PYTHON: "C:\\Miniconda36-x64"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "64"
+
+
+# We always use a 64-bit machine, but can build x86 distributions
+# with the TARGET_ARCH variable.
+platform:
+    - x64
+
+matrix:
+    fast_finish: false  # for testing
+
+install:
+    # Fetch submodules
+    - git submodule update --init --recursive
+
+    # Install miniconda
+    - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
+    - conda info
+
+    # Update pip
+    - python -m ensurepip
+    - python -m pip install --upgrade pip
+
+    # Check that we have the expected version and architecture for Python
+    - python --version
+    - python -c "import struct; print(struct.calcsize('P') * 8)"
+
+build_script:
+    # Install build requirements
+    - conda install --yes %BUILD_DEPENDS%
+
+    # build wheel:
+    - cd %REPO_DIR%
+    - git checkout %BUILD_COMMIT%
+    - pip wheel . -w dist/
+    - ls dist/
+
+test_script:
+    # create test env
+    - conda create --yes -n test_env python=%PYTHON_VERSION% %TEST_DEPENDS%
+    - activate test_env
+
+    # install from wheel
+    - pip install --no-index --find-links dist/ %PACKAGE_NAME%
+
+    # run test from installed wheel.
+    - mkdir empty
+    - cd empty
+    #- cd %HOMEDRIVE%%HOMEPATH%
+    # The package does not seem to define __version__
+    #- "python -c \"import bientropy; print('HDBSCAN version ' + bientropy.__version__)\""
+    # Now let's run our full test suite...
+    - "python -m bientropy.test_suite"
+    - cd ..
+    - deactivate
+
+artifacts:
+    - path: "%REPO_DIR%\\dist\\%PACKAGE_NAME%*"
+
+on_success:
+  # Report checksums
+  # - md5sum %REPO_DIR%\\dist\\%PACKAGE_NAME%*
+  # - sha256sum %REPO_DIR%\\dist\\%PACKAGE_NAME%*
+  # Upload the generated wheel package to Rackspace
+  # On Windows, Apache Libcloud cannot find a standard CA cert bundle so we
+  # disable the ssl checks.
+  #- pip install wheelhouse-uploader
+  #- "python -m wheelhouse_uploader upload
+  #  --no-ssl-check --local-folder=%REPO_DIR%\\dist --no-update-index wheels"

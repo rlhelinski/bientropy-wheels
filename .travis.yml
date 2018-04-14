@@ -1,0 +1,112 @@
+env:
+    global:
+        - REPO_DIR=bientropy
+        # Commit from your-project that you want to build
+        - BUILD_COMMIT=master
+        - PLAT=x86_64
+        - UNICODE_WIDTH=32
+        - BUILD_DEPENDS="numpy scipy"
+        - TEST_DEPENDS="numpy scipy nose"
+        - TWINE_USERNAME=rlhelinski
+        # Following generated with
+        # travis encrypt TWINE_PASSWORD=<the password>
+        - secure: "wbhJo8ZBdA1+us3WSizaN33DVULQflg54GlipExmLlMCEBepbNJQmvBr4jPPOrdko0ftTteRsxvGa/kgN34sXcFJZlgCaCTXr9eWYIPlRB4GdXf47rw1zD9+/Zb0wMja2h3FpvyuJE5cKO2yVwZBcqxyd6PaokwGy41sXtdxKzVE588g1zVxW2VxqfkQBIfZexw3rmyvqRz9L2UMjvNkGTICr++Er4uwQT3Lj1cLOMnKGzA1jTDz9Zzlh0bxi3cOxBGiuCsS7HtPUiLV80nuYl0pqOVqlZbsEZTvY9qmJI0gVaOOAhdrL/+wZ8T9PeLKncCmzNliXrTao00rRf97SLFATNukZAQfl9Y1bSroDPbXy9dSsUlz04K3UW/NqyBEQXFFvRcmbRyAoZE/fAtKYPL2QbKecTPwiV3R8namXN3UapsKPRKkDuPGLcmeirSJAxrGcaKDMWPFlMRiRi1bdqiBpEdGB00PQv05TYyIWmBs4gFPmpFMmVJSfHgTWB+42gMQLgFP9zN6VMoICdxRT7EsCR6ASFSVwsXez2x3eXqFuH46yFGFQ2wXM9snRZ2gSpAPnjCBSPkfGHjZ3DwCKAl1ysUL6fh8EQci6HRyGr6uxSAFFqB5pcT3X5MUy0KZxi67jPUqFDq0AF1bOvAZ5dczO6nQwkWwrSH4pTipSlU="
+
+language: python
+# The travis Python version is unrelated to the version we build and test
+# with.  This is set with the MB_PYTHON_VERSION variable.
+python: 3.5
+sudo: required
+dist: trusty
+services: docker
+
+matrix:
+  exclude:
+    # Exclude the default (TravisCI provided) Python 3.5 build
+    - python: 3.5
+  include:
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+        - UNICODE_WIDTH=16
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+        - PLAT=i686
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+        - PLAT=i686
+        - UNICODE_WIDTH=16
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.4
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.4
+        - PLAT=i686
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.5
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.5
+        - PLAT=i686
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.6
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.6
+        - PLAT=i686
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=2.7
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=3.4
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=3.5
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=3.6
+
+before_install:
+    - source multibuild/common_utils.sh
+    - source multibuild/travis_steps.sh
+    - before_install
+
+install:
+    # Maybe get and clean and patch source
+    - clean_code $REPO_DIR $BUILD_COMMIT
+    - build_wheel $REPO_DIR $PLAT
+
+script:
+    - install_run $PLAT
+
+after_success:
+    # Report checksums (needs to work on Linux and Mac OS X)
+    # For Mac OSX, could use 'brew install sha2' then 'sha2 -256 <files>'
+    #- md5sum ${TRAVIS_BUILD_DIR}/wheelhouse/${REPO_DIR}*
+    - |
+      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        shasum -a 256 ${TRAVIS_BUILD_DIR}/wheelhouse/${REPO_DIR}*.whl
+        pip install --upgrade pyOpenSSL
+      else
+        sha256sum ${TRAVIS_BUILD_DIR}/wheelhouse/${REPO_DIR}*.whl
+      fi
+    # Upload wheels to Rackspace container
+    - |
+      if [[ $TRAVIS_TAG ]]; then
+        python -m pip install twine
+        python -m twine upload --repository-url https://test.pypi.org/legacy/ \
+          ${TRAVIS_BUILD_DIR}/wheelhouse/${REPO_DIR}*.whl
+      fi
