@@ -4,7 +4,11 @@
 function pre_build {
     # Any stuff that you need to do before you start building the wheels
     # Runs in the root directory of this repository.
-    :
+    if [ -n "$IS_OSX" ] ; then
+        brew install gmp
+    else
+        apt-get install -y libgmp-dev
+    fi
 }
 
 function run_tests {
@@ -24,9 +28,9 @@ function run_tests {
     # Runs tests on installed distribution from an empty directory
     python --version
     # Check the simplest import, and version for consistency
-    #python -c "import bientropy; print('HDBSCAN version: ' + bientropy.__version__)"
+    #python -c "import bientropy; print('BiEntropy version: ' + bientropy.__version__)"
     # The package does not seem to define __version__, so use pkg_resources
-    python -c "import pkg_resources; print('HDBSCAN version: '+pkg_resources.get_distribution('bientropy').version)"
+    python -c "import pkg_resources; print('BiEntropy version: '+pkg_resources.get_distribution('bientropy').version)"
     # So far so good, now let's run our full test suite...
     python -m bientropy.test_suite
 }
