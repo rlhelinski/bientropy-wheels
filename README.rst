@@ -36,7 +36,7 @@ The procedure for compiling the wheels for a new release are as follows:
     cd ..;
     git add bientropy
 
-3.  ``git commit`` ...; ``git tag`` <new tag> ; ``git push``
+3.  ``git commit`` ...; ``git tag`` <new tag> ; ``git push --tags``
     The push will initiate the builds. The Travis CI jobs will try to upload to
     PyPI because the revision is tagged.
 
