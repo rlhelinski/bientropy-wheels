@@ -1,6 +1,6 @@
 [submodule "bientropy"]
 	path = bientropy
-	url = https://github.com/rlhelinski/bientropy.git
+	url = https://github.com/sandialabs/bientropy.git
 [submodule "multibuild"]
 	path = multibuild
 	url = https://github.com/matthew-brett/multibuild.git
