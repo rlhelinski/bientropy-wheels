@@ -40,7 +40,7 @@ The procedure for compiling the wheels for a new release are as follows:
 .. code:: bash
 
     git tag <new tag>
-    git push --tags
+    git push --follow-tags
 
 2.  Switch the ``bientropy`` revision referenced by the git submodule in
     ``bientropy-wheels`` to the revision you want to build:
@@ -69,7 +69,7 @@ The procedure for compiling the wheels for a new release are as follows:
 .. code:: bash
 
     git tag <new tag>
-    git push --tags
+    git push --follow-tags
 
 The git tag does not necessarily need to coincide with the tag that will be
 inside and part of the name of the wheel files. That version should be the same
