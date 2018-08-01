@@ -32,5 +32,5 @@ function run_tests {
     # The package does not seem to define __version__, so use pkg_resources
     python -c "import pkg_resources; print('BiEntropy version: '+pkg_resources.get_distribution('bientropy').version)"
     # So far so good, now let's run our full test suite...
-    python -m bientropy.test_suite
+    python -m bientropy.tests
 }
