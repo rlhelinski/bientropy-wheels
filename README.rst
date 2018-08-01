@@ -34,7 +34,8 @@ If you haven't already, clone this repository and set up the git submodules:
 The procedure for compiling the wheels for a new release are as follows:
 
 1.  Update the version string in the ``setup.py`` file in ``bientropy`` and tag
-    that revision ``<new tag>``.
+    that revision ``<new tag>``. Be sure to push this version, or the CI
+    runners will not be able to see it.
 
 2.  Switch the ``bientropy`` revision referenced by the git submodule in
     ``bientropy-wheels`` to the revision to build:
@@ -54,7 +55,7 @@ The procedure for compiling the wheels for a new release are as follows:
     git commit ...
     git push
 
-    The ``push`` will initiate the CI builds.
+The ``push`` will initiate the CI builds.
 
 4.  The Travis CI jobs will try to upload to PyPI if the revision is tagged.
     To do this, tag the revision before the ``push`` in the previous step:
