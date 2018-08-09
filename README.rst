@@ -22,7 +22,7 @@ These files were based on https://github.com/biopython/biopython-wheels
 Building a New Release
 ----------------------
 
-If you haven't already, clone this repository and set up the git submodules:
+If you have not already, clone this repository and set up the git submodules:
 
 .. code:: bash
 
@@ -34,11 +34,16 @@ If you haven't already, clone this repository and set up the git submodules:
 The procedure for compiling the wheels for a new release are as follows:
 
 1.  Update the version string in the ``setup.py`` file in ``bientropy`` and tag
-    that revision ``<new tag>``. Be sure to push this version, or the CI
-    runners will not be able to see it.
+    that revision ``<new tag>``. Be sure to push this version and the tag, or
+    the CI runners will not be able to see it.
+
+.. code:: bash
+
+    git tag <new tag>
+    git push --follow-tags
 
 2.  Switch the ``bientropy`` revision referenced by the git submodule in
-    ``bientropy-wheels`` to the revision to build:
+    ``bientropy-wheels`` to the revision you want to build:
 
 .. code:: bash
 
@@ -48,29 +53,31 @@ The procedure for compiling the wheels for a new release are as follows:
     cd ..
     git add bientropy
 
-3.  Commit the new revision reference in the ``bientropy-wheels`` repo:
+3.  Commit the new revision reference in the ``bientropy-wheels`` repo and push
+    to initiate the CI builds.
 
 .. code:: bash
 
     git commit ...
     git push
 
-The ``push`` will initiate the CI builds.
-
-4.  The Travis CI jobs will try to upload to PyPI if the revision is tagged.
-    To do this, tag the revision before the ``push`` in the previous step:
+4.  Travis CI does not have an artifacts feature like AppVeyor does. Therefore,
+    the Travis CI jobs will attempt to upload the wheel files to TestPyPI if
+    the revision is tagged.  To do this, tag the revision before the ``push``
+    in the previous step and be sure to push the tag:
 
 .. code:: bash
 
     git tag <new tag>
-    git push
+    git push --follow-tags
 
 The git tag does not necessarily need to coincide with the tag that will be
-inside and part of the name of the wheel files. That version will be the one
-from 'setup.py'.
+inside and part of the name of the wheel files. That version should be the same
+as the one from ``setup.py``.
 
-If you need to change the remote path to one of the projects, e.g. to reference
-a fork, then edit the ``.gitmodules`` file, commit that change and run
+If you need to change the remote path to one of the submodules, e.g. to
+reference a fork, then edit the ``.gitmodules`` file, commit that change and
+run the following commands:
 
 .. code:: bash
 
