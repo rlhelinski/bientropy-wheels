@@ -97,6 +97,8 @@ before_install:
     - source multibuild/common_utils.sh
     - source multibuild/travis_steps.sh
     - before_install
+    - ls wheelhouse
+    - grep version setup.py
 
 install:
     # Maybe get and clean and patch source
