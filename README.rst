@@ -35,12 +35,18 @@ The procedure for compiling the wheels for a new release are as follows:
 
 1.  Update the version string in the ``setup.py`` file in ``bientropy`` and tag
     that revision ``<new tag>``. Be sure to push this version and the tag, or
-    the CI runners will not be able to see it.
+    the CI runners will not be able to see it. Also, the CI jobs will switch
+    the ``bientropy`` submodule to the ``master`` branch after updating it to
+    the referenced revision, so make sure you merge your changes into
+    ``master``. This can be changed by specifying another branch or a commit in
+    the ``BUILD_COMMIT`` variable in ``.travis.yml`` and ``appveyor.yml``.
 
 .. code:: bash
 
+    git checkout master
     git tag <new tag>
-    git push --follow-tags
+    git push
+    git push --tags
 
 2.  Switch the ``bientropy`` revision referenced by the git submodule in
     ``bientropy-wheels`` to the revision you want to build:
